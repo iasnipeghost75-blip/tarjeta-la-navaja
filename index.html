@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tarjeta La Navaja</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>:root{color-scheme:dark}body{background:var(--b-bg);color:var(--b-fg)}</style>
+<style>body{margin:0}img{max-width:100%}</style>
+</head><body>
+<div class="cust">
+  <header class="cp-head" id="c-head"></header>
+  <main id="c-main"></main>
+</div>
+<nav id="c-nav" hidden aria-label="Secciones"><div class="cn">
+  <button data-act="go" data-tab="tarjeta">Tarjeta</button>
+  <button data-act="go" data-tab="avisos">Avisos</button>
+  <button data-act="go" data-tab="info">Info</button>
+</div></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>window.APP_PAGE="cliente";window.APP_TABS=["tarjeta","avisos","info"];</script>
+<script src="app.js"></script>
+</body></html>

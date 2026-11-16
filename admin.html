@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Panel La Navaja</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<header class="top">
+  <div class="wrap topin">
+    <a class="brand" href="#resumen"><span class="bmono" id="a-mono"></span><span id="a-name"></span><small>panel</small></a>
+    <div class="row"><span class="demo-chip">Datos de ejemplo</span><a class="btn sm" href="index.html">Ver la tarjeta del cliente</a></div>
+  </div>
+  <nav class="wrap tabs" id="tabs" aria-label="Secciones">
+    <button data-act="go" data-tab="resumen">Resumen</button>
+    <button data-act="go" data-tab="tarjeta">Tarjeta</button>
+    <button data-act="go" data-tab="escaner">Escáner</button>
+    <button data-act="go" data-tab="avisos">Avisos</button>
+    <button data-act="go" data-tab="informe">Informe</button>
+    <button data-act="go" data-tab="clientes">Clientes</button>
+    <button data-act="go" data-tab="equipo">Equipo</button>
+  </nav>
+</header>
+<main class="wrap">
+<section class="tab" id="tab-resumen">
+  <div class="sec-head"><p class="eyebrow">Resumen</p><h2>Qué puedes hacer hoy para que tus clientes vuelvan.</h2><p>Cada tarjeta cuenta cuántos clientes están en esa situación y deja enviarles el aviso con un toque.</p></div>
+  <div class="kpis" id="res-kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
+  <div class="who" id="res-cards" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))"></div>
+  <div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="panel"><h3>Últimos movimientos</h3><div class="log" id="res-log"></div></div>
+    <div class="panel"><h3>Atajos</h3>
+      <div class="row"><button class="btn" data-act="go" data-tab="escaner">Poner un sello</button><button class="btn" data-act="go" data-tab="tarjeta">Cambiar la tarjeta</button><button class="btn" data-act="go" data-tab="avisos">Escribir un aviso</button><button class="btn" data-act="go" data-tab="informe">Ver el informe</button><button class="btn" data-act="go" data-tab="clientes">Buscar clientes</button></div>
+    </div>
+  </div>
+</section>
+<section class="tab" id="tab-tarjeta" hidden>
+  <div class="sec-head"><p class="eyebrow">Tarjeta</p><h2>Todo lo que ven tus clientes, en un solo sitio.</h2><p>Los cambios se guardan solos. La tarjeta de la derecha se actualiza al momento y la página del cliente los muestra al recargarla.</p></div>
+  <div class="cols">
+    <div class="stack">
+      <div class="panel"><h3>Imagen de la tarjeta</h3>
+        <div class="grid2">
+          <label class="field"><span>Nombre de la barbería</span><input type="text" id="f-name" data-cfg="name" maxlength="40"></label>
+          <label class="field"><span>Frase corta</span><input type="text" id="f-tagline" data-cfg="tagline" maxlength="50"></label>
+        </div>
+        <div class="field"><span>Logo</span><div class="logo-row"><span class="logo-prev" id="logo-prev"></span><input type="file" id="f-logo" accept="image/*" style="max-width:220px"><button class="btn sm" data-act="logo-clear">Quitar</button></div></div>
+        <div class="grid3">
+          <label class="field"><span>Fondo</span><input type="color" id="f-c1" data-cfg="c1"></label>
+          <label class="field"><span>Sellos y detalles</span><input type="color" id="f-c2" data-cfg="c2"></label>
+          <label class="field"><span>Texto</span><input type="color" id="f-fg" data-cfg="fg"></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>Icono del sello</span><select id="f-icon" data-cfg="stampIcon"><option value="tijera">Tijeras</option><option value="check">Marca</option><option value="estrella">Estrella</option></select></label>
+          <div class="field"><span>&nbsp;</span><label class="check"><input type="checkbox" id="f-stripes" data-cfg="stripes">Franja de barbero arriba</label></div>
+        </div>
+      </div>
+      <div class="panel"><h3>Programa y premio</h3>
+        <div class="seg" role="radiogroup" aria-label="Tipo de programa">
+          <label><input type="radio" name="program" value="sellos" data-cfg="program">Sellos</label>
+          <label><input type="radio" name="program" value="puntos" data-cfg="program">Puntos</label>
+          <label><input type="radio" name="program" value="cashback" data-cfg="program">Cashback</label>
+        </div>
+        <label class="field"><span>Premio</span><input type="text" id="f-reward" data-cfg="reward" maxlength="60"></label>
+        <div class="grid2">
+          <label class="field" data-prog="sellos"><span>Sellos para el premio: <b id="v-stamps"></b></span><input type="range" min="4" max="12" id="f-stamps" data-cfg="stamps"></label>
+          <label class="field" data-prog="puntos"><span>Puntos por cada euro</span><input type="number" min="1" max="100" id="f-ppe" data-cfg="pointsPerEuro"></label>
+          <label class="field" data-prog="puntos"><span>Puntos para el premio</span><input type="number" min="10" max="5000" id="f-pgoal" data-cfg="pointsGoal"></label>
+          <label class="field" data-prog="cashback"><span>Cashback (% del importe)</span><input type="number" min="1" max="50" step="0.5" id="f-cb" data-cfg="cashbackPct"></label>
+          <label class="field" data-prog="cashback"><span>Saldo mínimo para usarlo (€)</span><input type="number" min="1" max="500" id="f-cbmin" data-cfg="cashbackMin"></label>
+        </div>
+      </div>
+      <div class="panel"><h3>Reglas y captación</h3>
+        <div class="grid2">
+          <label class="field"><span>Espera mínima entre sellos (minutos)</span><input type="number" min="0" max="1440" id="f-wait" data-cfg="minWait"></label>
+          <label class="field"><span>Cupón de bienvenida</span><input type="text" id="f-coupon" data-cfg="coupon" maxlength="20"></label>
+          <label class="field"><span>Regalo por traer a un amigo o usar el cupón (<span id="ref-unit" style="display:inline"></span>)</span><input type="number" min="0" max="500" id="f-ref" data-cfg="refBonus"></label>
+        </div>
+        <label class="field"><span>Enlace que abre el QR del mostrador</span><input type="text" id="f-qr" data-cfg="qrUrl" placeholder="https://..."></label>
+        <p class="hint">Si lo dejas vacío, el QR abre la página del cliente de esta demo.</p>
+        <label class="check"><input type="checkbox" id="f-tiers" data-cfg="tiersOn">Niveles de cliente según las visitas</label>
+        <div id="tiers-box" class="grid3">
+          <label class="field"><span>Nivel 1</span><input type="text" id="t0n" data-cfg="tiers.0.name"></label>
+          <label class="field"><span>Visitas</span><input type="number" min="1" id="t0v" data-cfg="tiers.0.visits"></label>
+          <label class="field"><span>Ventaja</span><input type="text" id="t0p" data-cfg="tiers.0.perk"></label>
+          <label class="field"><span>Nivel 2</span><input type="text" id="t1n" data-cfg="tiers.1.name"></label>
+          <label class="field"><span>Visitas</span><input type="number" min="1" id="t1v" data-cfg="tiers.1.visits"></label>
+          <label class="field"><span>Ventaja</span><input type="text" id="t1p" data-cfg="tiers.1.perk"></label>
+        </div>
+      </div>
+      <div class="panel"><h3>Servicios y precios</h3>
+        <p class="hint">Se eligen en el escáner al poner el sello y salen en el informe.</p>
+        <div id="svc-list" class="field"></div>
+        <button class="btn sm" style="align-self:flex-start" data-act="svc-add">Añadir servicio</button>
+      </div>
+      <div class="panel"><h3>Textos de la página del cliente</h3>
+        <label class="field"><span>Mensaje de bienvenida</span><textarea id="f-welcome" data-cfg="welcome" maxlength="160"></textarea></label>
+        <label class="field"><span>Cómo se suma (una frase por línea)</span><textarea id="f-rules" data-cfg="rules" rows="5"></textarea></label>
+        <label class="field"><span>Condiciones</span><textarea id="f-terms" data-cfg="terms" maxlength="240"></textarea></label>
+      </div>
+      <div class="panel"><h3>Datos de la barbería</h3>
+        <label class="field"><span>Dirección</span><input type="text" id="f-address" data-cfg="address"></label>
+        <div class="grid2">
+          <label class="field"><span>Horario (una línea por tramo)</span><textarea id="f-hours" data-cfg="hours" rows="3"></textarea></label>
+          <label class="field"><span>Teléfono</span><input type="text" id="f-phone" data-cfg="phone"></label>
+        </div>
+      </div>
+    </div>
+    <div class="sticky">
+      <div id="d-card"></div>
+      <div class="poster" id="d-poster"></div>
+      <a class="btn primary" href="index.html" style="text-align:center">Abrir la página del cliente</a>
+    </div>
+  </div>
+</section>
+<section class="tab" id="tab-escaner" hidden>
+  <div class="sec-head"><p class="eyebrow">Escáner del equipo</p><h2>El móvil de la caja pone el sello. Entra con tu PIN.</h2></div>
+  <div class="scan" id="scanner"></div>
+</section>
+<section class="tab" id="tab-avisos" hidden>
+  <div class="toolbar">
+    <div class="sec-head"><p class="eyebrow">Avisos</p><h2>Escribe el aviso, elige a quién y envíalo.</h2><p>Puedes usar {nombre}, {negocio}, {premio}, {progreso}, {codigo}, {nivel} y {ventaja}. Cada cliente recibe el texto con sus datos.</p></div>
+    <button class="btn primary" data-act="tpl-new">Nuevo aviso propio</button>
+  </div>
+  <div id="tpl-list" style="display:flex;flex-direction:column;gap:16px"></div>
+</section>
+<section class="tab" id="tab-informe" hidden>
+  <div class="toolbar">
+    <div class="sec-head"><p class="eyebrow">Informe del propietario</p><h2>Un correo corto cada lunes. Nada de paneles.</h2></div>
+    <div class="seg" style="min-width:260px"><label><input type="radio" name="week" value="last" checked data-act="week">Semana pasada</label><label><input type="radio" name="week" value="cur" data-act="week">Semana en curso</label></div>
+  </div>
+  <div id="report"></div>
+  <div class="sec-head"><p class="eyebrow">El día 25</p><h2>Ideas de marketing para el mes que viene, con el texto ya escrito.</h2><p>Se generan con los datos de tu tarjeta. Edita el texto y pulsa «Preparar aviso» para dejarlo listo en la pestaña Avisos.</p></div>
+  <div id="props"></div>
+</section>
+<section class="tab" id="tab-clientes" hidden>
+  <div class="sec-head"><p class="eyebrow">Clientes</p><h2>Quién tiene la tarjeta y cómo va cada uno.</h2></div>
+  <div id="cl-detail"></div>
+  <div class="panel">
+    <div class="row">
+      <input type="search" id="cl-search" placeholder="Buscar por nombre, correo o código" style="max-width:320px">
+      <span class="hint" id="cl-count"></span>
+    </div>
+    <div class="tbl"><table><thead><tr><th>Cliente</th><th>Código</th><th>Progreso</th><th class="n">Visitas</th><th>Última visita</th><th>Origen</th><th></th></tr></thead><tbody id="cl-body"></tbody></table></div>
+    <div class="grid3" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <label class="field"><span>Nombre</span><input type="text" id="cl-name"></label>
+      <label class="field"><span>Correo</span><input type="email" id="cl-email"></label>
+      <div class="field"><span>&nbsp;</span><button class="btn primary" data-act="cli-add">Añadir cliente</button></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Datos de la demo</h3>
+    <p class="hint">Restablece los clientes y movimientos de ejemplo, o empieza con todo vacío para probarla con alguien. Tu diseño de tarjeta se mantiene.</p>
+    <div class="row">
+      <button class="btn" data-act="reset-demo" id="b-reset">Restablecer datos de ejemplo</button>
+      <button class="btn danger" data-act="clear-all" id="b-clear">Empezar con todo vacío</button>
+    </div>
+  </div>
+</section>
+<section class="tab" id="tab-equipo" hidden>
+  <div class="sec-head"><p class="eyebrow">Equipo</p><h2>Quién puede poner sellos.</h2><p>Cada barbero entra al escáner con su PIN de 4 cifras y cada servicio queda apuntado a su nombre.</p></div>
+  <div class="panel" style="max-width:560px"><div id="team-list" class="field"></div><button class="btn sm" style="align-self:flex-start" data-act="team-add">Añadir a un barbero</button></div>
+</section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>window.APP_PAGE="admin";window.APP_TABS=["resumen","tarjeta","escaner","avisos","informe","clientes","equipo"];</script>
+<script src="app.js"></script>
+</body></html>

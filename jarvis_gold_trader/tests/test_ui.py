@@ -110,6 +110,7 @@ def test_analysis_and_history(win):
     import os
     assert os.path.exists(path)
     os.remove(path)
+    os.remove(path.replace("trades_", "decisions_"))
 
 
 def test_settings_apply_and_validation(win):

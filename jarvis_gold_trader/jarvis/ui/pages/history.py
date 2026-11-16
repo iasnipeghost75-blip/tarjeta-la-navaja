@@ -43,7 +43,7 @@ class HistoryPage(QWidget):
         self.btn_refresh = QPushButton("Actualizar")
         self.btn_refresh.clicked.connect(lambda: self.refresh(force=True))
         self.btn_export = QPushButton("Exportar CSV")
-        self.btn_export.clicked.connect(self.export_csv)
+        self.btn_export.clicked.connect(lambda: self.export_csv(notify=True))
         bar.addWidget(self.btn_refresh)
         bar.addWidget(self.btn_export)
         bar.addStretch(1)
@@ -135,7 +135,7 @@ class HistoryPage(QWidget):
         fig.update_layout(**THEME, height=330, showlegend=False, margin=dict(l=40, r=10, t=30, b=20))
         self.plot.show_figure(fig)
 
-    def export_csv(self) -> str:
+    def export_csv(self, notify: bool = False) -> str:
         out = PROJECT_ROOT / "reports"
         out.mkdir(exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -144,6 +144,6 @@ class HistoryPage(QWidget):
         self._trades_df().to_csv(p1, index=False)
         sid = self.ctrl.session_id if self.scope.currentIndex() == 0 else None
         self.ctrl.db.decisions(sid, limit=100000).to_csv(p2, index=False)
-        if self.isVisible():
+        if notify:
             QMessageBox.information(self, "Exportado", f"Archivos guardados:\n{p1}\n{p2}")
         return str(p1)

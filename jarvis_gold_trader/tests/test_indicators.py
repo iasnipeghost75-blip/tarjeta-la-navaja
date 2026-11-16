@@ -50,7 +50,7 @@ def test_all_features_are_causal(candles):
     part = eng.compute_features(candles.iloc[:cut])
     for col in part.columns:
         a, b = full[col].iloc[:cut], part[col]
-        if a.dtype == object or a.dtype == bool:
+        if not pd.api.types.is_numeric_dtype(a) or a.dtype == bool:
             assert a.equals(b), col
         else:
             assert np.allclose(a.astype(float), b.astype(float), equal_nan=True), col

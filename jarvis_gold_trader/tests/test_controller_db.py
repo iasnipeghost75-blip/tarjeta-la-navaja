@@ -79,6 +79,7 @@ def test_apply_config_and_reset(ctrl):
     import copy
     new = copy.deepcopy(ctrl.cfg)
     new.risk.max_positions = 2
+    new.risk.max_positions_per_side = 2
     new.risk.initial_balance = 5000
     warnings = ctrl.apply_config(new)
     assert ctrl.risk.cfg.max_positions == 2 and warnings

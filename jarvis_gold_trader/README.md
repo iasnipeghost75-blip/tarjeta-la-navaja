@@ -21,6 +21,8 @@ pip install -r requirements.txt
 
 ## 2. Uso
 
+**Inicio rápido:** doble clic en `iniciar_windows.bat` (Windows) o `./iniciar.sh` (Linux/macOS). Crean el entorno virtual, instalan dependencias, ejecutan las pruebas e inician la interfaz.
+
 ```bash
 python main.py                         # interfaz gráfica
 python run_backtest.py                 # backtest + validación por consola (datos sintéticos)

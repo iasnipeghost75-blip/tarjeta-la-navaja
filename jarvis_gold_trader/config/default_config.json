@@ -1,0 +1,100 @@
+{
+  "mode": "SIMULATION",
+  "database_path": "data/jarvis.db",
+  "market": {
+    "symbol": "XAUUSD",
+    "symbol_variants": [
+      "XAUUSD",
+      "XAUUSDm",
+      "XAUUSD.",
+      "GOLD",
+      "XAUUSD.a"
+    ],
+    "data_source": "synthetic",
+    "csv_path": "",
+    "analysis_timeframe": "M5",
+    "timeframes": [
+      "M1",
+      "M5",
+      "M15",
+      "M30",
+      "H1"
+    ],
+    "history_bars": 600,
+    "synthetic_seed": 7,
+    "synthetic_start_price": 2350.0,
+    "tick_interval_ms": 500,
+    "sim_seconds_per_tick": 15
+  },
+  "indicators": {
+    "ema_fast": 9,
+    "ema_mid": 21,
+    "ema_slow": 200,
+    "rsi_period": 14,
+    "rsi_overbought": 70.0,
+    "rsi_oversold": 30.0,
+    "macd_fast": 12,
+    "macd_slow": 26,
+    "macd_signal": 9,
+    "atr_period": 14,
+    "volume_period": 20,
+    "swing_lookback": 3,
+    "sr_levels": 4,
+    "use_volume": true,
+    "use_ema200_filter": true,
+    "use_rsi": true,
+    "use_macd": true,
+    "use_structure": true
+  },
+  "strategy": {
+    "min_confluence": 4,
+    "min_score": 60.0,
+    "max_extension_atr": 2.5,
+    "cooldown_bars": 3,
+    "min_entry_distance_atr": 0.75
+  },
+  "risk": {
+    "initial_balance": 10000.0,
+    "risk_per_trade_pct": 0.5,
+    "max_positions": 5,
+    "max_positions_per_side": 3,
+    "max_total_lots": 1.0,
+    "max_lot_per_trade": 0.2,
+    "min_lot": 0.01,
+    "lot_step": 0.01,
+    "stop_loss_atr": 1.5,
+    "take_profit_atr": 3.0,
+    "stop_loss_usd_points": 0.0,
+    "take_profit_usd_points": 0.0,
+    "trailing_enabled": true,
+    "trailing_activation_atr": 1.0,
+    "trailing_distance_atr": 1.0,
+    "daily_loss_limit_pct": 3.0,
+    "max_drawdown_pct": 10.0,
+    "extreme_volatility_ratio": 2.5,
+    "max_tick_jump_usd": 15.0,
+    "max_spread_usd": 1.0,
+    "block_averaging_down": true
+  },
+  "costs": {
+    "contract_size": 100.0,
+    "spread_usd": 0.3,
+    "commission_per_lot": 7.0,
+    "slippage_usd": 0.05
+  },
+  "smart_close": {
+    "enabled": true,
+    "individual_target_usd": 0.0,
+    "group_target_usd": 150.0,
+    "group_stop_usd": 300.0,
+    "close_positive_target_usd": 0.0,
+    "max_bars_in_trade": 96,
+    "close_on_opposite_signal": true
+  },
+  "backtest": {
+    "bars": 6000,
+    "train_ratio": 0.6,
+    "min_trades_for_stats": 20,
+    "seed": 11
+  }
+}

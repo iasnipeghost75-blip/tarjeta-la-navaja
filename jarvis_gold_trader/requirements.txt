@@ -1,0 +1,14 @@
+# Núcleo
+numpy>=1.26
+pandas>=2.1
+plotly>=5.20
+PySide6>=6.6          # incluye QtWebEngine para los gráficos Plotly embebidos
+
+# Conexión MetaTrader 5 (solo Windows, solo lectura de datos DEMO)
+MetaTrader5>=5.0.45; sys_platform == "win32"
+
+# Pruebas
+pytest>=7.4
+
+# Opcional: TA-Lib para verificar la equivalencia de indicadores (tests/test_indicators.py)
+# TA-Lib>=0.4.28

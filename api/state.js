@@ -5,11 +5,11 @@ let mem = null;
 
 async function readStore() {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return mem;
-  const { head } = await import('@vercel/blob');
+  const { get } = await import('@vercel/blob');
   try {
-    const h = await head(PATH);
-    const r = await fetch(h.url + '?t=' + Date.now(), { cache: 'no-store' });
-    return await r.json();
+    const r = await get(PATH, { access: 'private', useCache: false });
+    if (!r || r.statusCode === 404 || !r.stream) return null;
+    return JSON.parse(await new Response(r.stream).text());
   } catch (e) {
     if (e && e.name === 'BlobNotFoundError') return null;
     throw e;
@@ -20,7 +20,7 @@ async function writeStore(state) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) { mem = state; return; }
   const { put } = await import('@vercel/blob');
   await put(PATH, JSON.stringify(state), {
-    access: 'public',
+    access: 'private',
     allowOverwrite: true,
     addRandomSuffix: false,
     contentType: 'application/json',

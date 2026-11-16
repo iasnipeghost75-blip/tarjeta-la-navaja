@@ -40,7 +40,41 @@ const defTeam=()=>[{id:'t1',name:'Tom\u00e1s',pin:'1111'},{id:'t2',name:'Gabi',p
 let S=null;
 const U={tab:TABS[0],pcid:null,tid:null,scid:null,svc:0,amt:'',offline:false,ignoreWait:false,week:'last',queue:[],confirm:null,msg:null,ssearch:'',csearch:''};
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.cfg&&o.customers)return o}}catch(e){}return null}
-let _t;function save(){clearTimeout(_t);_t=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},250)}
+/* ---------- guardado: nube compartida si hay servidor, si no solo este navegador ---------- */
+const API='api/state',ME='navaja-me',SECS=['cfg','tpl','team','props'];
+let MODE='local',VER=0,B={c:{},s:{},m:''},SAVES=0,INFLIGHT=false,AGAIN=false,FORCE=false,PENDING=false,_t;
+const meGet=()=>{try{return localStorage.getItem(ME)}catch(e){return null}};
+const meSet=id=>{try{id?localStorage.setItem(ME,id):localStorage.removeItem(ME)}catch(e){}};
+const strip=c=>JSON.stringify({...c,u:undefined});
+function snapshot(){const b={c:{},s:{},m:String(S.lastPcid)};S.customers.forEach(c=>{b.c[c.id]=strip(c)});SECS.forEach(k=>{b.s[k]=JSON.stringify(S[k])});return b}
+function stampChanges(){const now=Date.now();S.at=S.at||{};S.del=S.del||{};
+  const ids=new Set(S.customers.map(c=>c.id));
+  S.customers.forEach(c=>{if(B.c[c.id]!==strip(c)||c.u==null)c.u=now});
+  Object.keys(B.c).forEach(id=>{if(!ids.has(id))S.del[id]=now});
+  SECS.forEach(k=>{if(B.s[k]!==JSON.stringify(S[k])||S.at[k]==null)S.at[k]=now});
+  if(B.m!==String(S.lastPcid)||S.at.m==null)S.at.m=now}
+function cache(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(replace){SAVES++;PENDING=true;if(replace===true)FORCE=true;clearTimeout(_t);_t=setTimeout(flush,MODE==='cloud'?350:250)}
+async function flush(){
+  PENDING=false;
+  if(MODE!=='cloud'){cache();return}
+  if(INFLIGHT){AGAIN=true;return}
+  INFLIGHT=true;const sc=SAVES,replace=FORCE;FORCE=false;
+  try{stampChanges();cache();const snap=snapshot();
+    const r=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({state:S,replace})});
+    const j=await r.json();
+    if(r.ok&&j&&j.state){if(SAVES===sc||j.stale)adopt(j.state,j.ver);else{VER=j.ver;B=snap}}
+  }catch(e){}
+  INFLIGHT=false;
+  if(AGAIN||SAVES!==sc){AGAIN=false;flush()}
+}
+function editing(){const a=document.activeElement;return !!a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=='checkbox'&&a.type!=='radio'&&a.type!=='button'}
+function adopt(state,ver){S=state;VER=ver;B=snapshot();cache();if(!editing())render()}
+async function poll(){
+  if(MODE!=='cloud'||INFLIGHT||PENDING||document.hidden||editing())return;
+  try{const r=await fetch(API+'?v='+VER+'&t='+Date.now(),{cache:'no-store'});const j=await r.json();
+    if(r.ok&&!j.same&&j.state&&j.ver!==VER&&!PENDING&&!INFLIGHT)adopt(j.state,j.ver)}catch(e){}
+}
 function toast(t){const e=$('#toast');if(!e)return;e.textContent=t;e.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove('on'),2600)}
 
 /* ---------- l\u00f3gica ---------- */
@@ -90,7 +124,7 @@ function redeem(c,{ts=Date.now(),tid}){const f=S.cfg;let value=1;
 /* ---------- datos de ejemplo ---------- */
 function seedData(keep){
   const cfg=(keep&&keep.cfg)||defCfg();
-  S={v:1,cfg,seq:0,customers:[],events:[],notifs:[],tpl:(keep&&keep.tpl)||defTpl(),props:[],lastPcid:null,team:(keep&&keep.team)||defTeam()};
+  S={v:1,epoch:uid(),cfg,seq:0,customers:[],events:[],notifs:[],tpl:(keep&&keep.tpl)||defTpl(),props:[],lastPcid:null,team:(keep&&keep.team)||defTeam(),at:{},del:{}};
   let a=11;const rng=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
   const now=Date.now();
   const names=['Carlos','Jordi','Pablo','Iv\u00e1n','Rub\u00e9n','Sergio','Marcos','Adri\u00e0','V\u00edctor','Hugo','\u00c1lvaro','Ra\u00fal','Nacho','Toni','Marc','Joan','Pol','Biel','Nil','\u00d3scar','Lucas','Diego','Mateo','Eric','Gerard','Pere','Alberto','Dani'];
@@ -210,7 +244,7 @@ function walletAdd(dev){
   if(!c){const bd=$('#r-bday').value,code=($('#r-code').value||'').trim();let source='mostrador',ref=null;
     if(code){ref=S.customers.find(x=>x.code.toLowerCase()===code.toLowerCase());if(ref)source='amigo';else if(code.toLowerCase()===S.cfg.coupon.toLowerCase())source='cupon'}
     c=newCustomer({name,email,bday:bd?bd.slice(5):'',source,device:dev});if(ref){bonus(c);bonus(ref)}else if(source==='cupon')bonus(c)}
-  U.pcid=c.id;S.lastPcid=c.id;save();toast('Tarjeta guardada en '+(dev==='apple'?'Apple Wallet':'Google Wallet'));go('tarjeta')}
+  U.pcid=c.id;meSet(c.id);S.lastPcid=c.id;save();toast('Tarjeta guardada en '+(dev==='apple'?'Apple Wallet':'Google Wallet'));go('tarjeta')}
 
 /* =====================================================
    PANEL: RESUMEN
@@ -425,7 +459,8 @@ document.addEventListener('click',ev=>{
   if(a==='reset-demo'||a==='clear-all'){const m=a==='reset-demo'?'reset':'clear';
     if(U.confirm!==m){U.confirm=m;return rClientes()}
     U.confirm=null;const keep={cfg:S.cfg,team:S.team,tpl:S.tpl};
-    if(m==='reset')seedData(keep);else{S={v:1,cfg:keep.cfg,seq:0,customers:[],events:[],notifs:[],tpl:keep.tpl,props:[],lastPcid:null,team:keep.team};save()}
+    if(m==='reset')seedData(keep);else{S={v:1,epoch:uid(),cfg:keep.cfg,seq:0,customers:[],events:[],notifs:[],tpl:keep.tpl,props:[],lastPcid:null,team:keep.team,at:{},del:{}}}
+    B={c:{},s:{},m:''};save(true);
     U.scid=null;U.queue=[];toast(m==='reset'?'Datos de ejemplo restablecidos':'Todo vac\u00edo. Ya puedes empezar.');return rClientes()}
 });
 document.addEventListener('input',ev=>{
@@ -450,7 +485,7 @@ document.addEventListener('input',ev=>{
 });
 document.addEventListener('change',ev=>{
   const el=ev.target;
-  if(el.id==='ph-select'){U.pcid=el.value||null;S.lastPcid=U.pcid;save();return go('tarjeta')}
+  if(el.id==='ph-select'){U.pcid=el.value||null;meSet(U.pcid);S.lastPcid=U.pcid;save();return go('tarjeta')}
   if(el.id==='sc-off'){U.offline=el.checked;if(!U.offline&&U.queue.length)return flushQueue();return rEscaner()}
   if(el.id==='sc-ign'){U.ignoreWait=el.checked;return}
   if(el.dataset.tplAuto){const t=S.tpl.find(x=>x.k===el.dataset.tplAuto);t.auto=el.checked;save();return rAvisos()}
@@ -458,11 +493,25 @@ document.addEventListener('change',ev=>{
   if(el.id==='f-logo'&&el.files[0]){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const m=192,k=Math.min(1,m/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);S.cfg.logo=cv.toDataURL('image/png');save();rTarjeta();brand()};im.src=fr.result};fr.readAsDataURL(el.files[0])}
 });
 window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(TABS.includes(t)&&t!==U.tab)go(t)});
-window.addEventListener('storage',e=>{if(e.key===KEY){const o=load();if(o){S=o;if(PAGE==='cliente'&&S.lastPcid&&cust(S.lastPcid))U.pcid=S.lastPcid;render()}}});
+window.addEventListener('storage',e=>{if(e.key===KEY&&MODE==='local'){const o=load();if(o){S=o;render()}}});
 
 /* ---------- arranque ---------- */
-S=load();if(!S)seedData();
-if(PAGE==='cliente'&&S.lastPcid&&cust(S.lastPcid))U.pcid=S.lastPcid;
-const h=(location.hash||'').slice(1);
-go(TABS.includes(h)?h:TABS[0]);
+(async()=>{
+  S=load();
+  try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),6000);
+    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(to);
+    const j=await r.json();
+    if(r.ok&&typeof j.ver==='number'){MODE='cloud';
+      if(j.state){S=j.state;VER=j.ver;cache()}
+      else{if(!S)seedData();S.epoch=S.epoch||uid();B={c:{},s:{},m:''};save(true)}}
+  }catch(e){}
+  if(!S)seedData();
+  if(!S.epoch)S.epoch=uid();
+  if(MODE==='cloud'&&VER)B=snapshot();
+  if(PAGE==='cliente'){const m=meGet();if(m&&cust(m))U.pcid=m}
+  const chip=$('.demo-chip');if(chip)chip.textContent=MODE==='cloud'?'Datos en la nube \u00b7 compartidos':'Datos solo en este navegador';
+  const h=(location.hash||'').slice(1);
+  go(TABS.includes(h)?h:TABS[0]);
+  setInterval(poll,4000);
+})();
 })();
